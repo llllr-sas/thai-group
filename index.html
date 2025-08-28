@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมตอบคำถาม</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS ทั่วไปและการจัดหน้า */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+            text-align: center;
+            transition: background-color 0.5s ease-in-out;
+            touch-action: manipulation; /* ป้องกันการซูมด้วยการแตะสองครั้ง */
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 500px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hearts {
+            font-size: 2.5rem;
+            color: #ff4757;
+        }
+
+        .heart {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .heart.lost {
+            color: #ccc;
+            transform: scale(0.8);
+            opacity: 0.5;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #555;
+            background-color: #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+        }
+
+        .question-box {
+            background-color: #f7f9fc;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            font-weight: 700;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Keyframes สำหรับการเบลอแบบค่อยๆ */
+        @keyframes gradual-blur {
+            from {
+                filter: blur(0px);
+            }
+            to {
+                filter: blur(5px);
+            }
+        }
+
+        /* เพิ่ม CSS สำหรับเบลอคำตอบ */
+        .answers-grid.blurred-answers {
+            animation: gradual-blur 0.5s ease-in-out forwards;
+        }
+
+        .answer-btn {
+            background-color: #74b9ff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 0 #0984e3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* ป้องกันการแตะซ้อนกันบนมือถือ */
+        .answer-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0984e3;
+        }
+
+        .answer-btn:hover {
+            background-color: #0984e3;
+        }
+
+        /* สถานะการตอบคำถาม */
+        .answer-btn.correct {
+            background-color: #2ecc71;
+            box-shadow: 0 4px 0 #27ae60;
+        }
+
+        .answer-btn.incorrect {
+            background-color: #e74c3c;
+            box-shadow: 0 4px 0 #c0392b;
+        }
+
+        /* หน้าจอเริ่มต้นและสิ้นสุดเกม */
+        .start-screen, .end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 20;
+            transition: all 0.5s ease-in-out;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .start-screen.hidden, .end-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .game-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .start-btn, .restart-btn {
+            background-color: #ff6b81;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #e65268;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:active, .restart-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #e65268;
+        }
+
+        .game-over-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        
+        /* สิ่งกีดขวางการมองเห็น */
+        .visual-obstruction {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0); /* เริ่มต้นด้วยความโปร่งใส */
+            backdrop-filter: blur(0px); /* เริ่มต้นด้วยไม่มีเบลอ */
+            transition: background-color 0.5s ease, backdrop-filter 0.5s ease;
+            pointer-events: none; /* ทำให้สามารถคลิกผ่านได้ */
+        }
+        
+        .visual-obstruction.active {
+            background-color: rgba(0, 0, 0, 0.8); /* ทำให้มืดขึ้น */
+            backdrop-filter: blur(10px); /* เพิ่มความเบลอ */
+        }
+
+        /* ข้อความสถานะ */
+        .status-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 30;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            pointer-events: none;
+            background-color: #2ecc71;
+            min-width: 150px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .status-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-20px);
+        }
+
+        .status-message.incorrect {
+            background-color: #e74c3c;
+        }
+        
+        /* การปรับสำหรับมือถือ */
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .game-container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            .game-title {
+                font-size: 2.5rem;
+            }
+            .question-text {
+                font-size: 1.2rem;
+            }
+            .answer-btn {
+                font-size: 1rem;
+                padding: 0.8rem;
+            }
+            .start-btn, .restart-btn {
+                padding: 1rem 1.5rem;
+                font-size: 1.2rem;
+            }
+            .hearts {
+                font-size: 2rem;
+            }
+            .timer {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- หน้าจอเริ่มต้น -->
+        <div class="start-screen">
+            <h1 class="game-title">เกมตอบคำถาม</h1>
+            <p>ตอบคำถามให้ถูกต้อง! มีเวลา 3 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
+            
+            <div style="margin: 2rem 0;">
+                <h2>ทีมผู้จัดทำ</h2>
+                <p><b>เขียนโปรแกรม:</b> นายธนกานต์ อรรคฮาต เลขที่ 5</p>
+                <p><b>ทำสไลด์:</b> ณรงค์กร รัษาภักดี เลขที่ 4</p>
+                <p><b>นำเสนอ, หาข้อมูล:</b> ขอบคุณ พระกาย เลขที่ 3</p>
+                <p><b>นำเสนอ, หาข้อมูล:</b> สุกฤษฎิ์ เพชชฤา เลขที่ 19(young j)</p>
+            </div>
+            
+            <button class="start-btn">เริ่มเกม</button>
+        </div>
+
+        <!-- หน้าจอเกมหลัก -->
+        <div id="game-content" class="hidden">
+            <div class="header">
+                <div class="hearts" id="hearts-display">
+                    <span class="heart" data-index="0">❤️</span>
+                    <span class="heart" data-index="1">❤️</span>
+                    <span class="heart" data-index="2">❤️</span>
+                </div>
+                <div class="timer" id="timer-display">3s</div>
+            </div>
+            <div class="question-box">
+                <p id="question-text" class="question-text">Loading...</p>
+            </div>
+            <div class="answers-grid" id="answers-grid">
+                <!-- ปุ่มคำตอบจะถูกสร้างโดย JavaScript -->
+            </div>
+        </div>
+
+        <!-- สิ่งกีดขวางการมองเห็น -->
+        <div id="visual-obstruction" class="visual-obstruction"></div>
+
+        <!-- หน้าจอจบเกม -->
+        <div class="end-screen hidden">
+            <h2 class="game-over-text">เกมจบแล้ว!</h2>
+            <p>คุณตอบคำถามได้ถูกต้อง <span id="score-display">0</span> ข้อ</p>
+            <button class="restart-btn">เล่นใหม่</button>
+        </div>
+
+        <!-- กล่องข้อความสถานะ -->
+        <div id="status-message" class="status-message"></div>
+    </div>
+
+    <script>
+        // ข้อมูลคำถามและคำตอบ
+        const questions = [
+            {
+                question: 'คำว่า “กะปิ” หมายถึงอะไร',
+                answers: ['ก. เครื่องเทศ', 'ข. เครื่องปรุง', 'ค. ภาชนะ', 'ง. ผลไม้'],
+                correct: 'ข. เครื่องปรุง'
+            },
+            {
+                question: '“กะลา” ใช้ทำอะไรได้',
+                answers: ['ก. ภาชนะ', 'ข. ดนตรี', 'ค. เสื้อผ้า', 'ง. เครื่องมือไถนา'],
+                correct: 'ก. ภาชนะ'
+            },
+            {
+                question: 'คำว่า “กะละมัง” เป็นหมวดหมู่ใด',
+                answers: ['ก. ราชการ', 'ข. ชีวิตประจำวัน', 'ค. ศาสนา', 'ง. ธรรมชาติ'],
+                correct: 'ข. ชีวิตประจำวัน'
+            },
+            {
+                question: '“กษัตริย์” เป็นคำที่มาจากภาษามอญในหมวดใด',
+                answers: ['ก. ศาสนาและวัฒนธรรม', 'ข. ธรรมชาติ', 'ค. อาหาร', 'ง. ของใช้'],
+                correct: 'ก. ศาสนาและวัฒนธรรม'
+            },
+            {
+                question: '“ครก” ใช้ทำอะไร',
+                answers: ['ก. กิน', 'ข. ตำอาหาร', 'ค. ปลูกต้นไม้', 'ง. ขุดดิน'],
+                correct: 'ข. ตำอาหาร'
+            },
+            {
+                question: 'คำว่า “ตำบล” เกี่ยวข้องกับอะไร',
+                answers: ['ก. การปกครอง', 'ข. ธรรมชาติ', 'ค. ศาสนา', 'ง. ผลไม้'],
+                correct: 'ก. การปกครอง'
+            },
+            {
+                question: '“กระบุง” หมายถึงอะไร',
+                answers: ['ก. ภาชนะ', 'ข. อาหาร', 'ค. ผลไม้', 'ง. เครื่องมือ'],
+                correct: 'ก. ภาชนะ'
+            },
+            {
+                question: '“กะทิ” ทำจากอะไร',
+                answers: ['ก. ข้าวโพด', 'ข. มะพร้าว', 'ค. กล้วย', 'ง. อ้อย'],
+                correct: 'ข. มะพร้าว'
+            },
+            {
+                question: 'คำว่า “มะพร้าว” มาจากภาษาอะไร',
+                answers: ['ก. เขมร', 'ข. มอญ', 'ค. จีน', 'ง. บาลี'],
+                correct: 'ก. เขมร'
+            },
+            {
+                question: '“ขนุน” เป็นคำมอญที่อยู่ในหมวดใด',
+                answers: ['ก. ผลไม้', 'ข. ภาชนะ', 'ค. การปกครอง', 'ง. ศาสนา'],
+                correct: 'ก. ผลไม้'
+            },
+            {
+                question: '“คลัง” เกี่ยวข้องกับอะไร',
+                answers: ['ก. ศาสนา', 'ข. เก็บของ/การปกครอง', 'ค. อาหาร', 'ง. ธรรมชาติ'],
+                correct: 'ข. เก็บของ/การปกครอง'
+            },
+            {
+                question: 'คำว่า “กะทัดรัด” มีความหมายใกล้เคียงกับข้อใด',
+                answers: ['ก. ใหญ่โต', 'ข. พอดี', 'ค. ยาวมาก', 'ง. เล็กมาก'],
+                correct: 'ข. พอดี'
+            },
+            {
+                question: '“จอก” คืออะไร',
+                answers: ['ก. แก้วเล็ก', 'ข. ผลไม้', 'ค. เครื่องมือไถนา', 'ง. เครื่องปรุง'],
+                correct: 'ก. แก้วเล็ก'
+            },
+            {
+                question: 'คำว่า “กะถิน” จัดอยู่ในหมวดใด',
+                answers: ['ก. ผลไม้', 'ข. พืช/ธรรมชาติ', 'ค. การปกครอง', 'ง. ศาสนา'],
+                correct: 'ข. พืช/ธรรมชาติ'
+            },
+            {
+                question: '“มหา” ในภาษาไทยที่รับมาจากมอญ หมายถึง',
+                answers: ['ก. เล็ก', 'ข. ใหญ่/ยิ่งใหญ่', 'ค. กลาง ๆ', 'ง. วิเศษ'],
+                correct: 'ข. ใหญ่/ยิ่งใหญ่'
+            },
+            {
+                question: 'คำว่า “โขลน” เกี่ยวกับ',
+                answers: ['ก. การรักษาความสงบ', 'ข. การทำอาหาร', 'ค. การปกครองบ้านเมือง', 'ง. การค้าขาย'],
+                correct: 'ก. การรักษาความสงบ'
+            },
+            {
+                question: '“ฉาง” หมายถึงที่เก็บอะไร',
+                answers: ['ก. เกลือ', 'ข. ข้าว', 'ค. น้ำ', 'ง. เครื่องมือ'],
+                correct: 'ข. ข้าว'
+            },
+            {
+                question: 'คำว่า “พระ” เป็นคำที่รับมาจากภาษามอญในหมวด',
+                answers: ['ก. ชีวิตประจำวัน', 'ข. ศาสนา', 'ค. การปกครอง', 'ง. ธรรมชาติ'],
+                correct: 'ข. ศาสนา'
+            },
+            {
+                question: '“กะได” มีความหมายใกล้เคียงกับอะไร',
+                answers: ['ก. บันไดน้ำ', 'ข. คันนา', 'ค. เขื่อน', 'ง. สะพาน'],
+                correct: 'ก. บันไดน้ำ'
+            },
+            {
+                question: 'คำว่า “ขุน” สะท้อนถึงหมวดหมู่ใด',
+                answers: ['ก. การปกครอง', 'ข. อาหาร', 'ค. ศาสนา', 'ง. ภาชนะ'],
+                correct: 'ก. การปกครอง'
+            }
+        ];
+
+        // ตัวแปรสถานะเกม
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let hearts = 3;
+        let timer = 3; // ลดเวลาเหลือ 3 วินาที
+        let timerInterval;
+        let score = 0;
+        let isGameOver = false;
+
+        // อ้างอิง DOM
+        const startScreen = document.querySelector('.start-screen');
+        const endScreen = document.querySelector('.end-screen');
+        const gameContent = document.getElementById('game-content');
+        const startBtn = document.querySelector('.start-btn');
+        const restartBtn = document.querySelector('.restart-btn');
+        const questionText = document.getElementById('question-text');
+        const answersGrid = document.getElementById('answers-grid');
+        const heartsDisplay = document.getElementById('hearts-display');
+        const timerDisplay = document.getElementById('timer-display');
+        const visualObstruction = document.getElementById('visual-obstruction');
+        const statusMessage = document.getElementById('status-message');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // ฟังก์ชันสุ่มข้อมูลใน Array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ฟังก์ชันเริ่มต้นเกม
+        function startGame() {
+            console.log('Game Started');
+            isGameOver = false;
+            hearts = 3;
+            score = 0;
+            currentQuestionIndex = 0;
+            currentQuestions = shuffle([...questions]); // สุ่มคำถามใหม่ทุกครั้งที่เริ่มเกม
+            
+            updateHeartsDisplay();
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameContent.classList.remove('hidden');
+            showQuestion();
+        }
+
+        // ฟังก์ชันแสดงคำถาม
+        function showQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                // หากตอบครบทุกคำถาม
+                endGame();
+                return;
+            }
+
+            const currentQuestion = currentQuestions[currentQuestionIndex];
+            
+            // สุ่มลำดับคำตอบสำหรับคำถามที่ 17-20
+            if (currentQuestionIndex >= 16 && currentQuestionIndex <= 19) {
+                answersGrid.classList.add('blurred-answers');
+                currentQuestion.answers = shuffle(currentQuestion.answers);
+            } else {
+                answersGrid.classList.remove('blurred-answers');
+            }
+
+            questionText.textContent = currentQuestion.question;
+            answersGrid.innerHTML = '';
+            
+            // สร้างปุ่มคำตอบ
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.textContent = answer;
+                button.classList.add('answer-btn');
+                button.addEventListener('click', () => checkAnswer(button, answer, currentQuestion.correct));
+                answersGrid.appendChild(button);
+            });
+            
+            // รีเซ็ตการแสดงผล
+            resetTimer();
+            visualObstruction.classList.remove('active');
+            statusMessage.classList.remove('show', 'correct', 'incorrect');
+        }
+
+        // ฟังก์ชันตรวจสอบคำตอบ
+        function checkAnswer(button, selectedAnswer, correctAnswer) {
+            if (isGameOver) return; // ไม่ให้ตอบคำถามถ้าเกมจบแล้ว
+
+            stopTimer();
+
+            if (selectedAnswer === correctAnswer) {
+                // ตอบถูก
+                score++;
+                button.classList.add('correct');
+                showStatusMessage('ถูกต้อง!', 'correct');
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    showQuestion();
+                }, 1000);
+            } else {
+                // ตอบผิด
+                hearts--;
+                button.classList.add('incorrect');
+                showStatusMessage('ผิด!', 'incorrect');
+                updateHeartsDisplay();
+                
+                // หาคำตอบที่ถูกต้องเพื่อแสดงผล
+                const correctButton = Array.from(answersGrid.children).find(btn => btn.textContent === correctAnswer);
+                if (correctButton) {
+                    correctButton.classList.add('correct');
+                }
+
+                if (hearts <= 0) {
+                    endGame();
+                } else {
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        showQuestion();
+                    }, 1000);
+                }
+            }
+        }
+
+        // ฟังก์ชันแสดงข้อความสถานะ
+        function showStatusMessage(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.classList.add('show', type);
+        }
+
+        // ฟังก์ชันอัปเดตการแสดงผลหัวใจ
+        function updateHeartsDisplay() {
+            const heartsElements = heartsDisplay.querySelectorAll('.heart');
+            heartsElements.forEach((heart, index) => {
+                if (index >= hearts) {
+                    heart.classList.add('lost');
+                } else {
+                    heart.classList.remove('lost');
+                }
+            });
+        }
+
+        // ฟังก์ชันเริ่มต้นตัวจับเวลา
+        function startTimer() {
+            timer = 3;
+            timerDisplay.textContent = `${timer}s`;
+            timerInterval = setInterval(() => {
+                timer--;
+                timerDisplay.textContent = `${timer}s`;
+
+                // การแสดงผลสิ่งที่มาบดบัง
+                if (timer <= 2) { // ทำให้เกิดเร็วขึ้น
+                    visualObstruction.classList.add('active');
+                }
+
+                if (timer <= 0) {
+                    endGame(true); // เวลาหมด
+                }
+            }, 1000);
+        }
+
+        // ฟังก์ชันหยุดตัวจับเวลา
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // ฟังก์ชันรีเซ็ตตัวจับเวลา
+        function resetTimer() {
+            stopTimer();
+            startTimer();
+        }
+
+        // ฟังก์ชันจบเกม
+        function endGame(timeout = false) {
+            isGameOver = true;
+            stopTimer();
+            console.log('game over');
+            if (timeout) {
+                // ถ้าเวลาหมดแต่ยังมีหัวใจเหลือ ให้หักหัวใจสุดท้ายแล้วจบเกม
+                hearts = 0;
+                updateHeartsDisplay();
+            }
+            
+            // แสดงหน้าจอจบเกม
+            document.body.style.backgroundColor = '#dcdde1';
+            endScreen.classList.remove('hidden');
+            gameContent.classList.add('hidden');
+            scoreDisplay.textContent = score;
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', () => {
+            document.body.style.backgroundColor = '#f0f2f5';
+            startGame();
+        });
+
+        // เริ่มต้นด้วยการแสดงหน้าจอเริ่มต้น
+        window.onload = function() {
+            startScreen.classList.remove('hidden');
+            gameContent.classList.add('hidden');
+            endScreen.classList.add('hidden');
+        };
+    </script>
+</body>
+</html>
