@@ -8,31 +8,46 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS ทั่วไปและการจัดหน้า */
+        /* General CSS and layout */
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            flex-direction: column;
+            min-height: 100vh;
             margin: 0;
             color: #333;
             text-align: center;
             transition: background-color 0.5s ease-in-out;
-            touch-action: manipulation; /* ป้องกันการซูมด้วยการแตะสองครั้ง */
+            touch-action: manipulation; /* Prevents double-tap zoom on mobile */
+            position: relative;
+        }
+        
+        /* Styles for splash screen and game screen */
+        #splash-screen, #game-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 2.5rem;
+            box-sizing: border-box;
         }
 
-        .game-container {
-            background-color: #ffffff;
-            border-radius: 20px;
-            padding: 2.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        #game-screen {
             max-width: 90%;
             width: 500px;
-            box-sizing: border-box;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             position: relative;
-            overflow: hidden;
+            z-index: 10;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         .header {
@@ -97,7 +112,7 @@
             z-index: 5;
         }
 
-        /* Keyframes สำหรับการเบลอแบบค่อยๆ */
+        /* Keyframes for gradual blur */
         @keyframes gradual-blur {
             from {
                 filter: blur(0px);
@@ -107,7 +122,7 @@
             }
         }
 
-        /* เพิ่ม CSS สำหรับเบลอคำตอบ */
+        /* Add CSS for blurring answers */
         .answers-grid.blurred-answers {
             animation: gradual-blur 0.5s ease-in-out forwards;
         }
@@ -128,7 +143,7 @@
             text-overflow: ellipsis;
         }
         
-        /* ป้องกันการแตะซ้อนกันบนมือถือ */
+        /* Prevents overlapping taps on mobile */
         .answer-btn:active {
             transform: translateY(2px);
             box-shadow: 0 2px 0 #0984e3;
@@ -138,7 +153,7 @@
             background-color: #0984e3;
         }
 
-        /* สถานะการตอบคำถาม */
+        /* Answer states */
         .answer-btn.correct {
             background-color: #2ecc71;
             box-shadow: 0 4px 0 #27ae60;
@@ -149,20 +164,21 @@
             box-shadow: 0 4px 0 #c0392b;
         }
 
-        /* หน้าจอเริ่มต้นและสิ้นสุดเกม */
+        /* Start and end game screens */
         .start-screen, .end-screen {
+            /* Full screen overlay */
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 20;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: rgba(255, 255, 255, 0.95);
-            z-index: 20;
-            transition: all 0.5s ease-in-out;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
             opacity: 1;
             visibility: visible;
         }
@@ -183,17 +199,18 @@
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 1rem 2rem;
-            font-size: 1.5rem;
+            padding: 1.2rem 2.5rem; /* Increase button size */
+            font-size: 1.8rem; /* Increase font size */
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 5px 0 #e65268;
+            box-shadow: 0 6px 0 #e65268; /* Increase shadow size */
             transition: all 0.3s ease;
+            margin-top: 2rem; /* Increase top margin */
         }
 
         .start-btn:active, .restart-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #e65268;
+            transform: translateY(4px); /* Increase movement */
+            box-shadow: 2px 2px 0 #e65268;
         }
 
         .game-over-text {
@@ -203,25 +220,32 @@
             margin-bottom: 1rem;
         }
         
-        /* สิ่งกีดขวางการมองเห็น */
+        .game-win-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2ecc71;
+            margin-bottom: 1rem;
+        }
+        
+        /* Visual obstruction */
         .visual-obstruction {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0); /* เริ่มต้นด้วยความโปร่งใส */
-            backdrop-filter: blur(0px); /* เริ่มต้นด้วยไม่มีเบลอ */
+            background-color: rgba(0, 0, 0, 0); /* Start with transparency */
+            backdrop-filter: blur(0px); /* Start with no blur */
             transition: background-color 0.5s ease, backdrop-filter 0.5s ease;
-            pointer-events: none; /* ทำให้สามารถคลิกผ่านได้ */
+            pointer-events: none; /* Allows clicks to pass through */
         }
         
         .visual-obstruction.active {
-            background-color: rgba(0, 0, 0, 0.8); /* ทำให้มืดขึ้น */
-            backdrop-filter: blur(10px); /* เพิ่มความเบลอ */
+            background-color: rgba(0, 0, 0, 0.8); /* Darken */
+            backdrop-filter: blur(10px); /* Add blur */
         }
 
-        /* ข้อความสถานะ */
+        /* Status message box */
         .status-message {
             position: absolute;
             bottom: 20px;
@@ -250,14 +274,9 @@
             background-color: #e74c3c;
         }
         
-        /* การปรับสำหรับมือถือ */
+        /* Mobile adjustments */
         @media (max-width: 768px) {
-            body {
-                height: auto;
-                min-height: 100vh;
-                padding: 20px;
-            }
-            .game-container {
+            #game-screen {
                 padding: 1.5rem;
                 margin: 1rem;
             }
@@ -285,57 +304,55 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- หน้าจอเริ่มต้น -->
-        <div class="start-screen">
-            <h1 class="game-title">เกมตอบคำถาม</h1>
-            <p>ตอบคำถามให้ถูกต้อง! มีเวลา 3 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
-            
-            <div style="margin: 2rem 0;">
-                <h2>ทีมผู้จัดทำ</h2>
-                <p><b>เขียนโปรแกรม:</b> นายธนกานต์ อรรคฮาต เลขที่ 5</p>
-                <p><b>ทำสไลด์:</b> ณรงค์กร รัษาภักดี เลขที่ 4</p>
-                <p><b>นำเสนอ, หาข้อมูล:</b> ขอบคุณ พระกาย เลขที่ 3</p>
-                <p><b>นำเสนอ, หาข้อมูล:</b> สุกฤษฎิ์ เพชชฤา เลขที่ 19(young j)</p>
-            </div>
-            
-            <button class="start-btn">เริ่มเกม</button>
+    <!-- Splash screen - full-screen overlay -->
+    <div id="splash-screen">
+        <h1 class="game-title">เกมตอบคำถาม</h1>
+        <p>ตอบคำถามให้ถูกต้อง! มีเวลา 3 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
+        
+        <div style="margin: 2rem 0;">
+            <h2>ทีมผู้จัดทำ</h2>
+            <p><b>เขียนโปรแกรม:</b> นายธนกานต์ อรรคฮาต เลขที่ 5</p>
+            <p><b>ทำสไลด์:</b> ณรงค์กร รัษาภักดี เลขที่ 4</p>
+            <p><b>นำเสนอ, หาข้อมูล:</b> ขอบคุณ พระกาย เลขที่ 3</p>
+            <p><b>นำเสนอ, หาข้อมูล:</b> สุกฤษฎิ์ เพชชฤา เลขที่ 19(young j)</p>
         </div>
-
-        <!-- หน้าจอเกมหลัก -->
-        <div id="game-content" class="hidden">
-            <div class="header">
-                <div class="hearts" id="hearts-display">
-                    <span class="heart" data-index="0">❤️</span>
-                    <span class="heart" data-index="1">❤️</span>
-                    <span class="heart" data-index="2">❤️</span>
-                </div>
-                <div class="timer" id="timer-display">3s</div>
-            </div>
-            <div class="question-box">
-                <p id="question-text" class="question-text">Loading...</p>
-            </div>
-            <div class="answers-grid" id="answers-grid">
-                <!-- ปุ่มคำตอบจะถูกสร้างโดย JavaScript -->
-            </div>
-        </div>
-
-        <!-- สิ่งกีดขวางการมองเห็น -->
-        <div id="visual-obstruction" class="visual-obstruction"></div>
-
-        <!-- หน้าจอจบเกม -->
-        <div class="end-screen hidden">
-            <h2 class="game-over-text">เกมจบแล้ว!</h2>
-            <p>คุณตอบคำถามได้ถูกต้อง <span id="score-display">0</span> ข้อ</p>
-            <button class="restart-btn">เล่นใหม่</button>
-        </div>
-
-        <!-- กล่องข้อความสถานะ -->
-        <div id="status-message" class="status-message"></div>
+        
+        <button class="start-btn">เริ่มเกม</button>
     </div>
 
+    <!-- Main game screen - hidden at start -->
+    <div id="game-screen" class="hidden">
+        <div class="header">
+            <div class="hearts" id="hearts-display">
+                <span class="heart" data-index="0">❤️</span>
+                <span class="heart" data-index="1">❤️</span>
+                <span class="heart" data-index="2">❤️</span>
+            </div>
+            <div class="timer" id="timer-display">3s</div>
+        </div>
+        <div class="question-box">
+            <p id="question-text" class="question-text">Loading...</p>
+        </div>
+        <div class="answers-grid" id="answers-grid">
+            <!-- Answer buttons will be generated by JavaScript -->
+        </div>
+
+        <!-- Visual obstruction -->
+        <div id="visual-obstruction" class="visual-obstruction"></div>
+    </div>
+    
+    <!-- Game over screen - moved outside game-screen -->
+    <div class="end-screen hidden">
+        <h2 id="end-message-title" class="game-over-text"></h2>
+        <p>คุณตอบคำถามได้ถูกต้อง <span id="score-display">0</span> ข้อ</p>
+        <button class="restart-btn">เล่นใหม่</button>
+    </div>
+
+    <!-- Status message box -->
+    <div id="status-message" class="status-message"></div>
+    
     <script>
-        // ข้อมูลคำถามและคำตอบ
+        // Question and answer data
         const questions = [
             {
                 question: 'คำว่า “กะปิ” หมายถึงอะไร',
@@ -439,19 +456,20 @@
             }
         ];
 
-        // ตัวแปรสถานะเกม
+        // Game state variables
         let currentQuestions = [];
         let currentQuestionIndex = 0;
         let hearts = 3;
-        let timer = 3; // ลดเวลาเหลือ 3 วินาที
+        let timer = 3; // Reduced time to 3 seconds
         let timerInterval;
         let score = 0;
         let isGameOver = false;
 
-        // อ้างอิง DOM
-        const startScreen = document.querySelector('.start-screen');
+        // DOM references
+        const splashScreen = document.getElementById('splash-screen');
+        const gameScreen = document.getElementById('game-screen');
         const endScreen = document.querySelector('.end-screen');
-        const gameContent = document.getElementById('game-content');
+        const endMessageTitle = document.getElementById('end-message-title');
         const startBtn = document.querySelector('.start-btn');
         const restartBtn = document.querySelector('.restart-btn');
         const questionText = document.getElementById('question-text');
@@ -462,7 +480,7 @@
         const statusMessage = document.getElementById('status-message');
         const scoreDisplay = document.getElementById('score-display');
 
-        // ฟังก์ชันสุ่มข้อมูลใน Array
+        // Function to shuffle an array
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -471,33 +489,33 @@
             return array;
         }
 
-        // ฟังก์ชันเริ่มต้นเกม
+        // Function to start the game
         function startGame() {
             console.log('Game Started');
             isGameOver = false;
             hearts = 3;
             score = 0;
             currentQuestionIndex = 0;
-            currentQuestions = shuffle([...questions]); // สุ่มคำถามใหม่ทุกครั้งที่เริ่มเกม
+            currentQuestions = shuffle([...questions]); // Shuffle questions for a new game
             
             updateHeartsDisplay();
-            startScreen.classList.add('hidden');
+            splashScreen.classList.add('hidden');
             endScreen.classList.add('hidden');
-            gameContent.classList.remove('hidden');
+            gameScreen.classList.remove('hidden');
             showQuestion();
         }
 
-        // ฟังก์ชันแสดงคำถาม
+        // Function to display a question
         function showQuestion() {
             if (currentQuestionIndex >= currentQuestions.length) {
-                // หากตอบครบทุกคำถาม
-                endGame();
+                // If all questions are answered
+                endGame(false, true); // End game as a win
                 return;
             }
 
             const currentQuestion = currentQuestions[currentQuestionIndex];
             
-            // สุ่มลำดับคำตอบสำหรับคำถามที่ 17-20
+            // Randomize answer order for questions 17-20 and blur them
             if (currentQuestionIndex >= 16 && currentQuestionIndex <= 19) {
                 answersGrid.classList.add('blurred-answers');
                 currentQuestion.answers = shuffle(currentQuestion.answers);
@@ -508,7 +526,7 @@
             questionText.textContent = currentQuestion.question;
             answersGrid.innerHTML = '';
             
-            // สร้างปุ่มคำตอบ
+            // Create answer buttons
             currentQuestion.answers.forEach(answer => {
                 const button = document.createElement('button');
                 button.textContent = answer;
@@ -517,20 +535,20 @@
                 answersGrid.appendChild(button);
             });
             
-            // รีเซ็ตการแสดงผล
+            // Reset display
             resetTimer();
             visualObstruction.classList.remove('active');
             statusMessage.classList.remove('show', 'correct', 'incorrect');
         }
 
-        // ฟังก์ชันตรวจสอบคำตอบ
+        // Function to check the answer
         function checkAnswer(button, selectedAnswer, correctAnswer) {
-            if (isGameOver) return; // ไม่ให้ตอบคำถามถ้าเกมจบแล้ว
+            if (isGameOver) return; // Do not check if the game is over
 
             stopTimer();
 
             if (selectedAnswer === correctAnswer) {
-                // ตอบถูก
+                // Correct answer
                 score++;
                 button.classList.add('correct');
                 showStatusMessage('ถูกต้อง!', 'correct');
@@ -539,20 +557,20 @@
                     showQuestion();
                 }, 1000);
             } else {
-                // ตอบผิด
+                // Incorrect answer
                 hearts--;
                 button.classList.add('incorrect');
                 showStatusMessage('ผิด!', 'incorrect');
                 updateHeartsDisplay();
                 
-                // หาคำตอบที่ถูกต้องเพื่อแสดงผล
+                // Find the correct answer to highlight it
                 const correctButton = Array.from(answersGrid.children).find(btn => btn.textContent === correctAnswer);
                 if (correctButton) {
                     correctButton.classList.add('correct');
                 }
 
                 if (hearts <= 0) {
-                    endGame();
+                    endGame(true, false); // End game as a loss
                 } else {
                     setTimeout(() => {
                         currentQuestionIndex++;
@@ -562,13 +580,13 @@
             }
         }
 
-        // ฟังก์ชันแสดงข้อความสถานะ
+        // Function to show status message
         function showStatusMessage(message, type) {
             statusMessage.textContent = message;
             statusMessage.classList.add('show', type);
         }
 
-        // ฟังก์ชันอัปเดตการแสดงผลหัวใจ
+        // Function to update hearts display
         function updateHeartsDisplay() {
             const heartsElements = heartsDisplay.querySelectorAll('.heart');
             heartsElements.forEach((heart, index) => {
@@ -580,7 +598,7 @@
             });
         }
 
-        // ฟังก์ชันเริ่มต้นตัวจับเวลา
+        // Function to start the timer
         function startTimer() {
             timer = 3;
             timerDisplay.textContent = `${timer}s`;
@@ -588,43 +606,54 @@
                 timer--;
                 timerDisplay.textContent = `${timer}s`;
 
-                // การแสดงผลสิ่งที่มาบดบัง
-                if (timer <= 2) { // ทำให้เกิดเร็วขึ้น
+                // Display visual obstruction
+                if (timer <= 2) { // Start sooner
                     visualObstruction.classList.add('active');
                 }
 
                 if (timer <= 0) {
-                    endGame(true); // เวลาหมด
+                    endGame(true, false); // Time's up, end as a loss
                 }
             }, 1000);
         }
 
-        // ฟังก์ชันหยุดตัวจับเวลา
+        // Function to stop the timer
         function stopTimer() {
             clearInterval(timerInterval);
         }
 
-        // ฟังก์ชันรีเซ็ตตัวจับเวลา
+        // Function to reset the timer
         function resetTimer() {
             stopTimer();
             startTimer();
         }
 
-        // ฟังก์ชันจบเกม
-        function endGame(timeout = false) {
+        // Function to end the game
+        function endGame(timeout = false, isWin = false) {
             isGameOver = true;
             stopTimer();
             console.log('game over');
             if (timeout) {
-                // ถ้าเวลาหมดแต่ยังมีหัวใจเหลือ ให้หักหัวใจสุดท้ายแล้วจบเกม
+                // If time runs out but hearts remain, lose the last heart and end the game
                 hearts = 0;
                 updateHeartsDisplay();
             }
             
-            // แสดงหน้าจอจบเกม
+            // Show win/loss message
+            if (isWin) {
+                endMessageTitle.textContent = 'คุณชนะแล้ว!';
+                endMessageTitle.classList.remove('game-over-text');
+                endMessageTitle.classList.add('game-win-text');
+            } else {
+                endMessageTitle.textContent = 'เกมจบแล้ว! คุณแพ้';
+                endMessageTitle.classList.remove('game-win-text');
+                endMessageTitle.classList.add('game-over-text');
+            }
+
+            // Show end screen
             document.body.style.backgroundColor = '#dcdde1';
             endScreen.classList.remove('hidden');
-            gameContent.classList.add('hidden');
+            gameScreen.classList.add('hidden');
             scoreDisplay.textContent = score;
         }
 
@@ -635,10 +664,11 @@
             startGame();
         });
 
-        // เริ่มต้นด้วยการแสดงหน้าจอเริ่มต้น
+        // Start with the splash screen
         window.onload = function() {
-            startScreen.classList.remove('hidden');
-            gameContent.classList.add('hidden');
+            // The new structure hides the game screen at the start
+            splashScreen.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
             endScreen.classList.add('hidden');
         };
     </script>
