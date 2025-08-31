@@ -307,7 +307,7 @@
     <!-- Splash screen - full-screen overlay -->
     <div id="splash-screen">
         <h1 class="game-title">เกมตอบคำถาม</h1>
-        <p>ตอบคำถามให้ถูกต้อง! มีเวลา 3 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
+        <p>ตอบคำถามให้ถูกต้อง! มีเวลา 5 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
         
         <div style="margin: 2rem 0;">
             <h2>ทีมผู้จัดทำ</h2>
@@ -328,7 +328,7 @@
                 <span class="heart" data-index="1">❤️</span>
                 <span class="heart" data-index="2">❤️</span>
             </div>
-            <div class="timer" id="timer-display">3s</div>
+            <div class="timer" id="timer-display">5s</div>
         </div>
         <div class="question-box">
             <p id="question-text" class="question-text">Loading...</p>
@@ -356,103 +356,103 @@
         const questions = [
             {
                 question: 'คำว่า “กะปิ” หมายถึงอะไร',
-                answers: ['ก. เครื่องเทศ', 'ข. เครื่องปรุง', 'ค. ภาชนะ', 'ง. ผลไม้'],
-                correct: 'ข. เครื่องปรุง'
+                answers: ['เครื่องเทศ', 'เครื่องปรุง', 'ภาชนะ', 'ผลไม้'],
+                correct: 'เครื่องปรุง'
             },
             {
                 question: '“กะลา” ใช้ทำอะไรได้',
-                answers: ['ก. ภาชนะ', 'ข. ดนตรี', 'ค. เสื้อผ้า', 'ง. เครื่องมือไถนา'],
-                correct: 'ก. ภาชนะ'
+                answers: ['ภาชนะ', 'ดนตรี', 'เสื้อผ้า', 'เครื่องมือไถนา'],
+                correct: 'ภาชนะ'
             },
             {
                 question: 'คำว่า “กะละมัง” เป็นหมวดหมู่ใด',
-                answers: ['ก. ราชการ', 'ข. ชีวิตประจำวัน', 'ค. ศาสนา', 'ง. ธรรมชาติ'],
-                correct: 'ข. ชีวิตประจำวัน'
+                answers: ['ราชการ', 'ชีวิตประจำวัน', 'ศาสนา', 'ธรรมชาติ'],
+                correct: 'ชีวิตประจำวัน'
             },
             {
                 question: '“กษัตริย์” เป็นคำที่มาจากภาษามอญในหมวดใด',
-                answers: ['ก. ศาสนาและวัฒนธรรม', 'ข. ธรรมชาติ', 'ค. อาหาร', 'ง. ของใช้'],
-                correct: 'ก. ศาสนาและวัฒนธรรม'
+                answers: ['ศาสนาและวัฒนธรรม', 'ธรรมชาติ', 'อาหาร', 'ของใช้'],
+                correct: 'ศาสนาและวัฒนธรรม'
             },
             {
                 question: '“ครก” ใช้ทำอะไร',
-                answers: ['ก. กิน', 'ข. ตำอาหาร', 'ค. ปลูกต้นไม้', 'ง. ขุดดิน'],
-                correct: 'ข. ตำอาหาร'
+                answers: ['กิน', 'ตำอาหาร', 'ปลูกต้นไม้', 'ขุดดิน'],
+                correct: 'ตำอาหาร'
             },
             {
                 question: 'คำว่า “ตำบล” เกี่ยวข้องกับอะไร',
-                answers: ['ก. การปกครอง', 'ข. ธรรมชาติ', 'ค. ศาสนา', 'ง. ผลไม้'],
-                correct: 'ก. การปกครอง'
+                answers: ['การปกครอง', 'ธรรมชาติ', 'ศาสนา', 'ผลไม้'],
+                correct: 'การปกครอง'
             },
             {
                 question: '“กระบุง” หมายถึงอะไร',
-                answers: ['ก. ภาชนะ', 'ข. อาหาร', 'ค. ผลไม้', 'ง. เครื่องมือ'],
-                correct: 'ก. ภาชนะ'
+                answers: ['ภาชนะ', 'อาหาร', 'ผลไม้', 'เครื่องมือ'],
+                correct: 'ภาชนะ'
             },
             {
                 question: '“กะทิ” ทำจากอะไร',
-                answers: ['ก. ข้าวโพด', 'ข. มะพร้าว', 'ค. กล้วย', 'ง. อ้อย'],
-                correct: 'ข. มะพร้าว'
+                answers: ['ข้าวโพด', 'มะพร้าว', 'กล้วย', 'อ้อย'],
+                correct: 'มะพร้าว'
             },
             {
                 question: 'คำว่า “มะพร้าว” มาจากภาษาอะไร',
-                answers: ['ก. เขมร', 'ข. มอญ', 'ค. จีน', 'ง. บาลี'],
-                correct: 'ก. เขมร'
+                answers: ['เขมร', 'มอญ', 'จีน', 'บาลี'],
+                correct: 'เขมร'
             },
             {
                 question: '“ขนุน” เป็นคำมอญที่อยู่ในหมวดใด',
-                answers: ['ก. ผลไม้', 'ข. ภาชนะ', 'ค. การปกครอง', 'ง. ศาสนา'],
-                correct: 'ก. ผลไม้'
+                answers: ['ผลไม้', 'ภาชนะ', 'การปกครอง', 'ศาสนา'],
+                correct: 'ผลไม้'
             },
             {
                 question: '“คลัง” เกี่ยวข้องกับอะไร',
-                answers: ['ก. ศาสนา', 'ข. เก็บของ/การปกครอง', 'ค. อาหาร', 'ง. ธรรมชาติ'],
-                correct: 'ข. เก็บของ/การปกครอง'
+                answers: ['ศาสนา', 'เก็บของ/การปกครอง', 'อาหาร', 'ธรรมชาติ'],
+                correct: 'เก็บของ/การปกครอง'
             },
             {
                 question: 'คำว่า “กะทัดรัด” มีความหมายใกล้เคียงกับข้อใด',
-                answers: ['ก. ใหญ่โต', 'ข. พอดี', 'ค. ยาวมาก', 'ง. เล็กมาก'],
-                correct: 'ข. พอดี'
+                answers: ['ใหญ่โต', 'พอดี', 'ยาวมาก', 'เล็กมาก'],
+                correct: 'พอดี'
             },
             {
                 question: '“จอก” คืออะไร',
-                answers: ['ก. แก้วเล็ก', 'ข. ผลไม้', 'ค. เครื่องมือไถนา', 'ง. เครื่องปรุง'],
-                correct: 'ก. แก้วเล็ก'
+                answers: ['แก้วเล็ก', 'ผลไม้', 'เครื่องมือไถนา', 'เครื่องปรุง'],
+                correct: 'แก้วเล็ก'
             },
             {
                 question: 'คำว่า “กะถิน” จัดอยู่ในหมวดใด',
-                answers: ['ก. ผลไม้', 'ข. พืช/ธรรมชาติ', 'ค. การปกครอง', 'ง. ศาสนา'],
-                correct: 'ข. พืช/ธรรมชาติ'
+                answers: ['ผลไม้', 'พืช/ธรรมชาติ', 'การปกครอง', 'ศาสนา'],
+                correct: 'พืช/ธรรมชาติ'
             },
             {
                 question: '“มหา” ในภาษาไทยที่รับมาจากมอญ หมายถึง',
-                answers: ['ก. เล็ก', 'ข. ใหญ่/ยิ่งใหญ่', 'ค. กลาง ๆ', 'ง. วิเศษ'],
-                correct: 'ข. ใหญ่/ยิ่งใหญ่'
+                answers: ['เล็ก', 'ใหญ่/ยิ่งใหญ่', 'กลาง ๆ', 'วิเศษ'],
+                correct: 'ใหญ่/ยิ่งใหญ่'
             },
             {
                 question: 'คำว่า “โขลน” เกี่ยวกับ',
-                answers: ['ก. การรักษาความสงบ', 'ข. การทำอาหาร', 'ค. การปกครองบ้านเมือง', 'ง. การค้าขาย'],
-                correct: 'ก. การรักษาความสงบ'
+                answers: ['การรักษาความสงบ', 'การทำอาหาร', 'การปกครองบ้านเมือง', 'การค้าขาย'],
+                correct: 'การรักษาความสงบ'
             },
             {
                 question: '“ฉาง” หมายถึงที่เก็บอะไร',
-                answers: ['ก. เกลือ', 'ข. ข้าว', 'ค. น้ำ', 'ง. เครื่องมือ'],
-                correct: 'ข. ข้าว'
+                answers: ['เกลือ', 'ข้าว', 'น้ำ', 'เครื่องมือ'],
+                correct: 'ข้าว'
             },
             {
                 question: 'คำว่า “พระ” เป็นคำที่รับมาจากภาษามอญในหมวด',
-                answers: ['ก. ชีวิตประจำวัน', 'ข. ศาสนา', 'ค. การปกครอง', 'ง. ธรรมชาติ'],
-                correct: 'ข. ศาสนา'
+                answers: ['ชีวิตประจำวัน', 'ศาสนา', 'การปกครอง', 'ธรรมชาติ'],
+                correct: 'ศาสนา'
             },
             {
                 question: '“กะได” มีความหมายใกล้เคียงกับอะไร',
-                answers: ['ก. บันไดน้ำ', 'ข. คันนา', 'ค. เขื่อน', 'ง. สะพาน'],
-                correct: 'ก. บันไดน้ำ'
+                answers: ['บันไดน้ำ', 'คันนา', 'เขื่อน', 'สะพาน'],
+                correct: 'บันไดน้ำ'
             },
             {
                 question: 'คำว่า “ขุน” สะท้อนถึงหมวดหมู่ใด',
-                answers: ['ก. การปกครอง', 'ข. อาหาร', 'ค. ศาสนา', 'ง. ภาชนะ'],
-                correct: 'ก. การปกครอง'
+                answers: ['การปกครอง', 'อาหาร', 'ศาสนา', 'ภาชนะ'],
+                correct: 'การปกครอง'
             }
         ];
 
@@ -460,10 +460,11 @@
         let currentQuestions = [];
         let currentQuestionIndex = 0;
         let hearts = 3;
-        let timer = 3; // Reduced time to 3 seconds
+        let timer = 5; // Updated time to 5 seconds
         let timerInterval;
         let score = 0;
         let isGameOver = false;
+        let isProcessingAnswer = false; // New flag to prevent multiple clicks
 
         // DOM references
         const splashScreen = document.getElementById('splash-screen');
@@ -509,16 +510,19 @@
         function showQuestion() {
             if (currentQuestionIndex >= currentQuestions.length) {
                 // If all questions are answered
-                endGame(false, true); // End game as a win
+                endGame(true); // End game as a win
                 return;
             }
 
+            isProcessingAnswer = false; // Reset the flag for the new question
             const currentQuestion = currentQuestions[currentQuestionIndex];
             
-            // Randomize answer order for questions 17-20 and blur them
+            // Shuffle answers for ALL questions
+            currentQuestion.answers = shuffle(currentQuestion.answers);
+            
+            // Apply blur effect only for questions 17-20 (index 16-19)
             if (currentQuestionIndex >= 16 && currentQuestionIndex <= 19) {
                 answersGrid.classList.add('blurred-answers');
-                currentQuestion.answers = shuffle(currentQuestion.answers);
             } else {
                 answersGrid.classList.remove('blurred-answers');
             }
@@ -543,6 +547,12 @@
 
         // Function to check the answer
         function checkAnswer(button, selectedAnswer, correctAnswer) {
+            // Prevent multiple clicks
+            if (isProcessingAnswer) {
+                return;
+            }
+            isProcessingAnswer = true;
+
             if (isGameOver) return; // Do not check if the game is over
 
             stopTimer();
@@ -570,7 +580,7 @@
                 }
 
                 if (hearts <= 0) {
-                    endGame(true, false); // End game as a loss
+                    endGame(false); // End game as a loss
                 } else {
                     setTimeout(() => {
                         currentQuestionIndex++;
@@ -600,7 +610,7 @@
 
         // Function to start the timer
         function startTimer() {
-            timer = 3;
+            timer = 5; // Updated time to 5 seconds
             timerDisplay.textContent = `${timer}s`;
             timerInterval = setInterval(() => {
                 timer--;
@@ -612,7 +622,19 @@
                 }
 
                 if (timer <= 0) {
-                    endGame(true, false); // Time's up, end as a loss
+                    stopTimer();
+                    hearts--;
+                    updateHeartsDisplay();
+                    showStatusMessage('หมดเวลา!', 'incorrect');
+                    
+                    if (hearts <= 0) {
+                        endGame(false); // End game as a loss
+                    } else {
+                        setTimeout(() => {
+                            currentQuestionIndex++;
+                            showQuestion();
+                        }, 1000);
+                    }
                 }
             }, 1000);
         }
@@ -629,15 +651,10 @@
         }
 
         // Function to end the game
-        function endGame(timeout = false, isWin = false) {
+        function endGame(isWin = false) {
             isGameOver = true;
             stopTimer();
             console.log('game over');
-            if (timeout) {
-                // If time runs out but hearts remain, lose the last heart and end the game
-                hearts = 0;
-                updateHeartsDisplay();
-            }
             
             // Show win/loss message
             if (isWin) {
