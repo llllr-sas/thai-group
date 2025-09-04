@@ -307,7 +307,7 @@
     <!-- Splash screen - full-screen overlay -->
     <div id="splash-screen">
         <h1 class="game-title">เกมตอบคำถาม</h1>
-        <p>ตอบคำถามให้ถูกต้อง! มีเวลา 5 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
+        <p>ตอบคำถามให้ถูกต้อง! มีเวลา 3 วินาทีต่อคำถาม และหัวใจ 3 ดวง</p>
         
         <div style="margin: 2rem 0;">
             <h2>ทีมผู้จัดทำ</h2>
@@ -328,7 +328,7 @@
                 <span class="heart" data-index="1">❤️</span>
                 <span class="heart" data-index="2">❤️</span>
             </div>
-            <div class="timer" id="timer-display">5s</div>
+            <div class="timer" id="timer-display">3s</div>
         </div>
         <div class="question-box">
             <p id="question-text" class="question-text">Loading...</p>
@@ -460,7 +460,7 @@
         let currentQuestions = [];
         let currentQuestionIndex = 0;
         let hearts = 3;
-        let timer = 5; // Updated time to 5 seconds
+        let timer = 3; // Updated time to 3 seconds
         let timerInterval;
         let score = 0;
         let isGameOver = false;
@@ -610,7 +610,7 @@
 
         // Function to start the timer
         function startTimer() {
-            timer = 5; // Updated time to 5 seconds
+            timer = 3; // Updated time to 3 seconds
             timerDisplay.textContent = `${timer}s`;
             timerInterval = setInterval(() => {
                 timer--;
